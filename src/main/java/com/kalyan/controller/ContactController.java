@@ -26,23 +26,25 @@ public class ContactController {
 
 	@PostMapping("/save")
 	public ResponseEntity<String> saveRecord(@RequestBody Contact contact) {
-		try {
-			boolean status = contactService.insertContactetails(contact);
-			if (status)
-				return new ResponseEntity<String>("Record Inserted", HttpStatus.CREATED);
-		} catch (Exception e) {
+
+		boolean status = contactService.insertContactetails(contact);
+		if (status)
+			return new ResponseEntity<String>("Record Inserted", HttpStatus.CREATED);
+		else {
 			return new ResponseEntity<String>("Failure to Insert", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		return null;
 
 	}
 
 	@GetMapping("/getAllContactDetails")
-	public ResponseEntity<List<Contact>> getAllDetails() throws NoContactFoundException {
-
-		List<Contact> allContactDetails = contactService.getContactDetails();
-		if (allContactDetails != null)
-			return new ResponseEntity<List<Contact>>(allContactDetails, HttpStatus.OK);
+	public ResponseEntity<List<Contact>> getAllDetails() {
+		try {
+			List<Contact> allContactDetails = contactService.getContactDetails();
+			if (allContactDetails != null)
+				return new ResponseEntity<List<Contact>>(allContactDetails, HttpStatus.OK);
+		} catch (Exception e) {
+			throw new NoContactFoundException("No Contact Details Found::");
+		}
 		return null;
 
 	}
@@ -70,8 +72,7 @@ public class ContactController {
 	}
 
 	@PutMapping("/updateContact")
-	public ResponseEntity<String> deleteContactDetailsById(@RequestBody Contact contact)
-			throws NoContactFoundException {
+	public ResponseEntity<String> updateContactDetails(@RequestBody Contact contact) throws NoContactFoundException {
 
 		String contactDetails = contactService.updateContactDetailsById(contact);
 		if (contactDetails != null)

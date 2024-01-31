@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.kalyan.entity.Contact;
+import com.kalyan.errorcodes.ErrorCode;
 import com.kalyan.exception.NoContactFoundException;
+import com.kalyan.exception.UnableToUpdateRecord;
 import com.kalyan.repository.ContactRepository;
 
 @Service
@@ -36,7 +38,7 @@ public class ContactService {
 	public Contact getContactDetailsById(Integer contactid) {
 
 		Optional<Contact> getContact = contactRepository.findById(contactid);
-		if (!getContact.isEmpty())
+		if (getContact.isPresent())
 			return getContact.get();
 		else
 			throw new NoContactFoundException("No record is found::");
@@ -45,9 +47,9 @@ public class ContactService {
 
 	// Delete Contact Details by Id
 	public String deleteContactDetailsById(Integer contactid) {
-		Contact contactDetailsById = getContactDetailsById(contactid);
-		if (contactDetailsById != null) {
-			contactRepository.delete(contactDetailsById);
+		Optional<Contact> findById = contactRepository.findById(contactid);
+		if (!findById.isEmpty()) {
+			contactRepository.delete(findById.get());
 			return "Contact Details Deleted";
 		} else
 			throw new NoContactFoundException("No record is found::");
@@ -56,16 +58,16 @@ public class ContactService {
 
 	// Update Contact Details
 	public String updateContactDetailsById(Contact contact) {
-		String updateSucess = null;
+		String updatestatus = null;
 		Contact contactDetailsById = getContactDetailsById(contact.getCid());
 		if (contactDetailsById != null) {
 			boolean insertContact = insertContactetails(contact);
 			if (insertContact) {
-				updateSucess = "Given Contact Details is Updated Sucessfully:" + contact.getCid();
+				updatestatus = "Given Contact Details is Updated Sucessfully:" + contact.getCid();
 			} else
-				throw new NoContactFoundException("No record is found::");
+				throw new UnableToUpdateRecord(ErrorCode.UNABLE_TO_UPDATE_RECORD);
 		}
-		return updateSucess;
+		return updatestatus;
 
 	}
 

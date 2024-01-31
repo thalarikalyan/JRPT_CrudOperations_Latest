@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.kalyan.error.Error;
 import com.kalyan.errorcodes.ErrorCode;
 import com.kalyan.exception.NoContactFoundException;
+import com.kalyan.exception.UnableToUpdateRecord;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -20,6 +21,20 @@ public class GlobalExceptionHandler {
 		Error eb = new Error();
 
 		eb.setCode(ErrorCode.ERROR_CODE);
+		eb.setMsg(message);
+
+		return new ResponseEntity<Error>(eb, HttpStatus.BAD_REQUEST);
+
+	}
+
+	@ExceptionHandler(value = UnableToUpdateRecord.class)
+	public ResponseEntity<Error> handleUnableToUpdateRecord(UnableToUpdateRecord unableToUpdateRecord) {
+
+		String message = unableToUpdateRecord.getMessage();
+
+		Error eb = new Error();
+
+		eb.setCode(ErrorCode.UNABLE_TO_UPDATE_RECORD);
 		eb.setMsg(message);
 
 		return new ResponseEntity<Error>(eb, HttpStatus.BAD_REQUEST);
